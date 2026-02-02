@@ -25,6 +25,10 @@ public class UsuarioService {
 	public Optional<Usuario> buscarPorEmail(String email) {
 		return usuRepo.findByEmail(email);
 	}
+	
+	public Optional<Usuario> buscarPorTelefono(String telefono) {
+		return usuRepo.findByTelefono(telefono);
+	}
 
 	public List<Usuario> listaUsuario() {
 		return usuRepo.findAll();
@@ -34,7 +38,10 @@ public class UsuarioService {
 		usuRepo.save(objU);
 	}
 	
-	public List<Usuario> listarUsuariosVisibles(boolean visible){
-		return usuRepo.findByVisible(visible);
+	public List<Usuario> listarUsuariosConsentimiento(boolean consentimiento){
+		return usuRepo.findByConsentimiento(consentimiento);
+	}
+	public void eliminar(int id) {
+		usuRepo.deleteById(id);
 	}
 }

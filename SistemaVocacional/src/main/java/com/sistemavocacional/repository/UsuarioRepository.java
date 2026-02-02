@@ -11,5 +11,6 @@ import com.sistemavocacional.entity.Usuario;
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
 	Optional<Usuario> findByEmail(String email);
-	List<Usuario> findByVisible(boolean visible);
+	Optional<Usuario> findByTelefono(String telefono);
+	List<Usuario> findByConsentimiento(boolean visible);
 }
