@@ -23,15 +23,11 @@ import com.sistemavocacional.service.UsuarioService;
 @RequestMapping("/usuario")
 public class UsuarioController {
 
-    private final LoginController loginController;
 	@Autowired
 	private UsuarioService uSer;
 	
 	BCryptPasswordEncoder pasEncode = new BCryptPasswordEncoder();
 
-    UsuarioController(LoginController loginController) {
-        this.loginController = loginController;
-    }
 	
 	@PostMapping("/registrarUsuario")
 	public ResponseEntity<?> guardarUsuario(@RequestBody Usuario u) {
