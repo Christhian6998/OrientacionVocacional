@@ -22,9 +22,8 @@ public class Usuario {
 	private boolean consentimiento;
 	private Date fechaNacimiento, fechaRegistro;
 	
-	// Recomendacion cuando hagas de onetomany coloca el jsonignore
 	@OneToMany(mappedBy = "usuario")
 	@JsonIgnore
-	private List<Respuesta> respuesta;
+	private List<IntentoTest> intento;
 
 }

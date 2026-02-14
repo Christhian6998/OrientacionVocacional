@@ -1,5 +1,7 @@
 package com.sistemavocacional.security;
 
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.util.Date;
 
 import org.springframework.stereotype.Component;
@@ -9,11 +11,16 @@ import com.sistemavocacional.entity.Usuario;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 
 @Component
 public class JwtUtil {
 	
-	private final String SECRET_KEY = "Desarr0lloDePruebaVocacional.";
+	private final Key SECRET_KEY =
+            Keys.hmacShaKeyFor(
+                "Desarrollo_De_Prueba_Vocacional_super_segura_123456789."
+                .getBytes(StandardCharsets.UTF_8)
+            );
 
     // tiempo de vida del token (30 minutos)
     private final long EXPIRATION_TIME = 1000 * 60 * 30;
@@ -24,7 +31,7 @@ public class JwtUtil {
                 .claim("rol", usuario.getRol())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+                .signWith(SECRET_KEY, SignatureAlgorithm.HS256)
                 .compact();
     }
 
@@ -46,9 +53,10 @@ public class JwtUtil {
     }
 
     private Claims getClaims(String token) {
-        return Jwts.parser()
-                .setSigningKey(SECRET_KEY)
-                .parseClaimsJws(token)
-                .getBody();
+    	return Jwts.parserBuilder()
+    	        .setSigningKey(SECRET_KEY)
+    	        .build()
+    	        .parseClaimsJws(token)
+    	        .getBody();
     }
 }

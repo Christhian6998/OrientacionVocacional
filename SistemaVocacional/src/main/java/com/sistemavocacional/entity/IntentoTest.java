@@ -1,5 +1,7 @@
 package com.sistemavocacional.entity;
 
+import java.util.Date;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -9,19 +11,13 @@ import lombok.Data;
 
 @Entity
 @Data
-public class Respuesta {
+public class IntentoTest {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer idRespuesta;
-	// en vez de usuar IdUsuario y idOpcion y luego relacionarla, mejor la relacionamos 
-	// directamente con la clase Usuario y Opcion
-	
-	private double afinidadPorcentaje;
-	private String DescripcionResultado;
+	private Integer idIntento;
+	private Date fecha;
+	private int numeroIntento;
 	
 	@ManyToOne
 	private Usuario usuario;
-	
-	@ManyToOne
-	private Opcion opcion;
 }
