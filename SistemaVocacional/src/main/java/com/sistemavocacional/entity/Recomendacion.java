@@ -10,29 +10,25 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import lombok.Data;
 
 @Entity
 @Data
-public class IntentoTest {
+public class Recomendacion {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer idIntento;
-	private Date fecha;
-	private int numeroIntento;
+	private Integer idRecomendacion;
+	private String RecomendacionGeneral;
+	private Date fechaRegistrada;
 	private boolean estado;
-	
-	@ManyToOne
-	@JoinColumn(name = "id_usuario")
-	private Usuario usuario;
-	
-	@OneToMany(mappedBy = "intento")
-	@JsonIgnore
-    private List<Respuesta> respuestas;
 
-    @OneToOne(mappedBy = "intento")
-    private Recomendacion recomendacion;
+    @OneToOne
+    @JoinColumn(name = "id_intento")
+    private IntentoTest intento;
+
+    @OneToMany(mappedBy = "recomendacion")
+    @JsonIgnore
+    private List<RecomendacionCarrera> carreras;
 }

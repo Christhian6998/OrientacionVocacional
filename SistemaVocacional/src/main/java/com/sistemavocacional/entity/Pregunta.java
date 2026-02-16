@@ -1,6 +1,5 @@
 package com.sistemavocacional.entity;
 
-import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -9,30 +8,20 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import lombok.Data;
 
 @Entity
 @Data
-public class IntentoTest {
+public class Pregunta {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer idIntento;
-	private Date fecha;
-	private int numeroIntento;
+	private Integer idPregunta;
+	private String enunciado, tipo;
+	private double peso;
 	private boolean estado;
 	
-	@ManyToOne
-	@JoinColumn(name = "id_usuario")
-	private Usuario usuario;
-	
-	@OneToMany(mappedBy = "intento")
+	@OneToMany(mappedBy = "pregunta")
 	@JsonIgnore
     private List<Respuesta> respuestas;
-
-    @OneToOne(mappedBy = "intento")
-    private Recomendacion recomendacion;
 }
