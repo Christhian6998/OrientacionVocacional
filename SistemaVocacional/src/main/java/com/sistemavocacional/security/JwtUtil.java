@@ -23,7 +23,7 @@ public class JwtUtil {
             );
 
     // tiempo de vida del token (30 minutos)
-    private final long EXPIRATION_TIME = 1000 * 60 * 30;
+    private final long EXPIRATION_TIME = 1000 * 60 * 60;
 
     public String generarToken(Usuario usuario) {
         return Jwts.builder()
