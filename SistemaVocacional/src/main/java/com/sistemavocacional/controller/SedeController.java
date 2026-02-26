@@ -81,9 +81,9 @@ public class SedeController {
         actual.setLatitud(s.getLatitud());
         actual.setLongitud(s.getLongitud());
 
-        sSer.actualizar(actual);
+        Sede sedeActual=sSer.actualizar(actual);
         
-        return ResponseEntity.ok("Sede actualizada correctamente");
+        return ResponseEntity.ok(sedeActual);
     }
 
 

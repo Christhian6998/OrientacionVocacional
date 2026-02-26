@@ -30,8 +30,8 @@ public class SedeService {
         return sedeRepo.save(s);
     }
 
-    public void actualizar(Sede s) {
-        sedeRepo.save(s);
+    public Sede actualizar(Sede s) {
+        return sedeRepo.save(s);
     }
 
     public void eliminar(int idSede) {

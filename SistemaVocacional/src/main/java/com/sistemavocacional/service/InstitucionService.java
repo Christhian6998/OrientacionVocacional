@@ -37,15 +37,15 @@ public class InstitucionService {
     }
 
     public List<Institucion> listar() {
-        return instRepo.findAll();
+        return instRepo.findAllByOrderByNombreAsc();
     }
 
     public List<Institucion> listarActivos() {
         return instRepo.findByEstadoTrue();
     }
 
-    public void actualizar(Institucion i) {
-        instRepo.save(i);
+    public Institucion actualizar(Institucion i) {
+        return instRepo.save(i);
     }
 
     @Transactional

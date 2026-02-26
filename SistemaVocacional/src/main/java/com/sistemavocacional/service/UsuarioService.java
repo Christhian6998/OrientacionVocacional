@@ -7,12 +7,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.sistemavocacional.entity.Usuario;
+import com.sistemavocacional.repository.IntentoTestRepository;
+import com.sistemavocacional.repository.RecomendacionCarreraRepository;
+import com.sistemavocacional.repository.RecomendacionRepository;
+import com.sistemavocacional.repository.RespuestaRepository;
 import com.sistemavocacional.repository.UsuarioRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class UsuarioService {
 	@Autowired
 	private UsuarioRepository usuRepo;
+	@Autowired
+	private RecomendacionCarreraRepository recCarRepo;
+	@Autowired
+	private RecomendacionRepository recRepo;
+	@Autowired
+	private RespuestaRepository respuestaRepo;
+	@Autowired
+	private IntentoTestRepository intentoRepo;
 	
 	public Optional<Usuario> buscarPorId(int idUsuario){
 		return usuRepo.findById(idUsuario);
@@ -41,7 +55,17 @@ public class UsuarioService {
 	public List<Usuario> listarUsuariosConsentimiento(boolean consentimiento){
 		return usuRepo.findByConsentimiento(consentimiento);
 	}
-	public void eliminar(int id) {
-		usuRepo.deleteById(id);
+	
+	@Transactional
+	public void eliminar(int idUsuario) {
+	    if (!usuRepo.existsById(idUsuario)) {
+	        throw new RuntimeException("El usuario no existe");
+	    }
+	    recCarRepo.deleteByRecomendacionIntentoUsuarioIdUsuario(idUsuario);
+	    recRepo.deleteByIntentoUsuarioIdUsuario(idUsuario);
+	    respuestaRepo.deleteByIntentoUsuarioIdUsuario(idUsuario);
+	    intentoRepo.deleteByUsuarioIdUsuario(idUsuario);
+
+	    usuRepo.deleteById(idUsuario);
 	}
 }

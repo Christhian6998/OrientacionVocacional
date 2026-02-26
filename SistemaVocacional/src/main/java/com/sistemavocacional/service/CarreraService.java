@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.sistemavocacional.entity.Carrera;
 import com.sistemavocacional.repository.CarreraRepository;
+import com.sistemavocacional.repository.CriterioCarreraRepository;
 import com.sistemavocacional.repository.OfertaCarreraRepository;
 
 import jakarta.transaction.Transactional;
@@ -19,6 +20,9 @@ public class CarreraService {
 	
 	@Autowired
 	private OfertaCarreraRepository ofertaRep;
+	
+	@Autowired
+	private CriterioCarreraRepository criCarrRep;
 
     public Optional<Carrera> buscarPorId(int id){
         return carreraRep.findById(id);
@@ -37,17 +41,18 @@ public class CarreraService {
     }
     
     public List<Carrera> listarActivas(){
-        return carreraRep.findByEstadoTrue();
+        return carreraRep.findByEstadoTrueOrderByNombreAsc();
     }
 
 
-    public void actualizar(Carrera c){
-        carreraRep.save(c);
+    public Carrera actualizar(Carrera c){
+        return carreraRep.save(c);
     }
 
     @Transactional
     public void eliminarFisico(int id){
     	ofertaRep.deleteByCarreraIdCarrera(id);
+    	criCarrRep.deleteByCarreraIdCarrera(id);;
     	
         carreraRep.deleteById(id);
     }

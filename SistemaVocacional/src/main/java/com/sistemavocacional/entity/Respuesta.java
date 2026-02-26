@@ -16,7 +16,6 @@ public class Respuesta {
 	private Integer idRespuesta;
 	private String valor;
 	private double puntaje;
-	private boolean estado;
 	
 	@ManyToOne
     @JoinColumn(name = "id_pregunta")

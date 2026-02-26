@@ -84,9 +84,9 @@ public class CarreraController {
         actual.setDescripcion(c.getDescripcion());
         actual.setArea(c.getArea().toUpperCase());
 
-        cSer.actualizar(actual);
+        Carrera cactual=cSer.actualizar(actual);
 
-        return ResponseEntity.ok("Carrera actualizada correctamente");
+        return ResponseEntity.ok(cactual);
     }
 
     @DeleteMapping("/eliminarCarrera/{id}")

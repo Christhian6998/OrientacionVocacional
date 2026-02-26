@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -14,26 +13,17 @@ import lombok.Data;
 
 @Entity
 @Data
-public class Carrera {
+public class Criterio {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer idCarrera;
-	private String nombre, area;
+	private Integer idCriterio;
+	private String nombre;
 	
-	@Column(columnDefinition = "TEXT")
-	private String descripcion;
-	private boolean estado;
-
-    @OneToMany(mappedBy = "carrera")
-    @JsonIgnore
-    private List<OfertaCarrera> ofertas;
-
-    @OneToMany(mappedBy = "carrera")
-    @JsonIgnore
-    private List<RecomendacionCarrera> recomendaciones;
-    
-    @OneToMany(mappedBy = "carrera")
+	@OneToMany(mappedBy = "criterio")
     @JsonIgnore
     private List<CriterioCarrera> criterioCarrera;
 	
+	@OneToMany(mappedBy = "criterio")
+    @JsonIgnore
+    private List<Pregunta> preguntas;
 }

@@ -48,7 +48,8 @@ public class AuthController {
                 new LoginResponse(
                         token,
                         user.getRol(),
-                        user.getEmail()
+                        user.getEmail(),
+                        user.getIdUsuario()
                 )
         );
     }

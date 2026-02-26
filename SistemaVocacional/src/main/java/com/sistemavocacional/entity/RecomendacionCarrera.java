@@ -1,5 +1,7 @@
 package com.sistemavocacional.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,11 +17,10 @@ public class RecomendacionCarrera {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer idRecCarrera;
 	private double afinidad;
-	private String razon;
-	private boolean estado;
 	
 	@ManyToOne
     @JoinColumn(name = "id_recomendacion")
+	@JsonIgnore
     private Recomendacion recomendacion;
 
     @ManyToOne

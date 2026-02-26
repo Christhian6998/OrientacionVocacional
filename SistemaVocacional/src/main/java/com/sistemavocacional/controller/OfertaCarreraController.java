@@ -104,9 +104,9 @@ public class OfertaCarreraController {
         actual.setCostoPension(of.getCostoPension());
         actual.setModalidad(of.getModalidad().trim().toUpperCase());
 
-        ofSer.actualizar(actual);
+        OfertaCarrera ofertaActual=ofSer.actualizar(actual);
 
-        return ResponseEntity.ok("Oferta actualizada correctamente");
+        return ResponseEntity.ok(ofertaActual);
     }
 
     @DeleteMapping("/eliminarOferta/{id}")

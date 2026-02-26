@@ -34,8 +34,8 @@ public class OfertaCarreraService {
         return ofertaRepo.findByInstitucionIdInstitucionAndEstadoTrue(idInstitucion);
     }
 
-    public void actualizar(OfertaCarrera o) {
-        ofertaRepo.save(o);
+    public OfertaCarrera actualizar(OfertaCarrera o) {
+        return ofertaRepo.save(o);
     }
 
     public void eliminar(int idOferta) {

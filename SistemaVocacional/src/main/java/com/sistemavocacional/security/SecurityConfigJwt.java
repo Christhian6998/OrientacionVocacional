@@ -34,6 +34,16 @@ public class SecurityConfigJwt {
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/auth/login").permitAll()
             .requestMatchers("/usuario/registrarUsuario").permitAll()
+            .requestMatchers("/usuario/listarUsuariosConsentimiento").hasRole("ADMIN")
+            .requestMatchers("/usuario/listarUsuarios").hasRole("ADMIN")
+            .requestMatchers("/usuario/eliminarUsuario/**").hasRole("ADMIN")
+            .requestMatchers("/usuario/actualizarUsuario/**").hasAnyRole("ADMIN", "POSTULANTE")
+            
+            .requestMatchers("/test/**").hasRole("POSTULANTE")
+            
+            .requestMatchers("/pregunta/**").hasRole("ADMIN")
+            
+            .requestMatchers("/criterio/**").hasRole("ADMIN")
             
             .requestMatchers("/institucion/listarInstitucionesActivas").permitAll()
             .requestMatchers("/institucion/listarInstituciones").hasRole("ADMIN")
@@ -81,7 +91,7 @@ public class SecurityConfigJwt {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of("http://localhost:4200"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE","PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 

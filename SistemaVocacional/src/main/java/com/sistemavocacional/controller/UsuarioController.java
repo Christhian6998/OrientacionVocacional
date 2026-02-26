@@ -6,6 +6,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -75,6 +77,11 @@ public class UsuarioController {
 	
 	@PutMapping("/actualizarUsuario/{id}")
 	public ResponseEntity<?> actualizarUsuario(@PathVariable int id, @RequestBody Usuario u) {
+		// validacion de seguridad
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+	    String emailAutenticado = auth.getName();
+	    boolean isAdmin = auth.getAuthorities().stream()
+	                          .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
 
 	    Optional<Usuario> usuarioOpt = uSer.buscarPorId(id);
 
@@ -84,6 +91,11 @@ public class UsuarioController {
 
 	    Usuario actual = usuarioOpt.get();
 
+	    if (!isAdmin && !actual.getEmail().equals(emailAutenticado)) {
+	        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+	                             .body("No tienes permiso para actualizar este perfil");
+	    }
+	    
 	    // Validar correo
 	    Optional<Usuario> correoExiste = uSer.buscarPorEmail(u.getEmail());
 	    if (correoExiste.isPresent() && correoExiste.get().getIdUsuario() != id) {

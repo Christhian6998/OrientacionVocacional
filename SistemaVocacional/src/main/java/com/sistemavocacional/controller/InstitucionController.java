@@ -77,9 +77,9 @@ public class InstitucionController {
         actual.setNombre(i.getNombre().trim().toUpperCase());
         actual.setTipo(i.getTipo().trim().toUpperCase());
 
-        iSer.actualizar(actual);
+        Institucion actualizada = iSer.actualizar(actual);
         
-        return ResponseEntity.ok("Institución actualizada correctamente");
+        return ResponseEntity.ok(actualizada);
     }
 
     @DeleteMapping("/eliminarInstitucion/{id}")

@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -23,10 +24,10 @@ public class IntentoTest {
 	private Integer idIntento;
 	private Date fecha;
 	private int numeroIntento;
-	private boolean estado;
 	
 	@ManyToOne
 	@JoinColumn(name = "id_usuario")
+	@JsonIgnore
 	private Usuario usuario;
 	
 	@OneToMany(mappedBy = "intento")
@@ -34,5 +35,6 @@ public class IntentoTest {
     private List<Respuesta> respuestas;
 
     @OneToOne(mappedBy = "intento")
+    @JsonIgnoreProperties("intento")
     private Recomendacion recomendacion;
 }

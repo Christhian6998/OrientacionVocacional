@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -20,12 +21,12 @@ public class Recomendacion {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer idRecomendacion;
-	private String RecomendacionGeneral;
+	private String perfil;
 	private Date fechaRegistrada;
-	private boolean estado;
 
     @OneToOne
     @JoinColumn(name = "id_intento")
+    @JsonIgnoreProperties("recomendacion")
     private IntentoTest intento;
 
     @OneToMany(mappedBy = "recomendacion")

@@ -23,12 +23,13 @@ public class JwtUtil {
             );
 
     // tiempo de vida del token (30 minutos)
-    private final long EXPIRATION_TIME = 1000 * 60 * 60;
+    private final long EXPIRATION_TIME = 1000 * 60 * 60 * 2;
 
     public String generarToken(Usuario usuario) {
         return Jwts.builder()
                 .setSubject(usuario.getEmail())
                 .claim("rol", usuario.getRol())
+                .claim("id", usuario.getIdUsuario())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(SECRET_KEY, SignatureAlgorithm.HS256)
@@ -50,6 +51,10 @@ public class JwtUtil {
         } catch (Exception e) {
             return false;
         }
+    }
+    
+    public Integer obtenerId(String token) {
+        return getClaims(token).get("id", Integer.class);
     }
 
     private Claims getClaims(String token) {
