@@ -38,6 +38,7 @@ public class SecurityConfigJwt {
             .requestMatchers("/usuario/listarUsuarios").hasRole("ADMIN")
             .requestMatchers("/usuario/eliminarUsuario/**").hasRole("ADMIN")
             .requestMatchers("/usuario/actualizarUsuario/**").hasAnyRole("ADMIN", "POSTULANTE")
+            .requestMatchers("/buscarPorEmail/**").hasAnyRole("POSTULANTE")
             
             .requestMatchers("/test/**").hasRole("POSTULANTE")
             
@@ -73,7 +74,6 @@ public class SecurityConfigJwt {
             .requestMatchers("/ofertaCarrera/actualizarOferta/**").hasRole("ADMIN")
             .requestMatchers("/ofertaCarrera/eliminarOferta/**").hasRole("ADMIN")
             .requestMatchers("/ofertaCarrera/estado/**").hasRole("ADMIN")
-            //.requestMatchers("/usuario/actualizarUsuario/**").hasAnyRole("ADMIN", "POSTULANTE")
             .anyRequest().authenticated()
         )
         .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
@@ -90,13 +90,12 @@ public class SecurityConfigJwt {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:4200"));
+        config.setAllowedOrigins(List.of("http://localhost:4200","*"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE","PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source =
-                new UrlBasedCorsConfigurationSource();
+        UrlBasedCorsConfigurationSource source =new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
 
         return source;

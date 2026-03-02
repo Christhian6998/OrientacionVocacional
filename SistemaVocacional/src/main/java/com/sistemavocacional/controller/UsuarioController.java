@@ -74,6 +74,11 @@ public class UsuarioController {
 	    return ResponseEntity.ok(uSer.listaUsuario());
 	}
 	
+	@GetMapping("/buscarPorEmail/{email}")
+	public ResponseEntity<Optional<Usuario>> buscarUsuario(@PathVariable String email) {
+	    return ResponseEntity.ok(uSer.buscarPorEmail(email));
+	}
+	
 	
 	@PutMapping("/actualizarUsuario/{id}")
 	public ResponseEntity<?> actualizarUsuario(@PathVariable int id, @RequestBody Usuario u) {
