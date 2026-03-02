@@ -14,6 +14,7 @@ jobs:
         distribution: 'temurin'
         cache: 'maven'
     - name: Build with Maven
+      working-directory: SistemaVocacional
       run: mvn clean install -DskipTests
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
