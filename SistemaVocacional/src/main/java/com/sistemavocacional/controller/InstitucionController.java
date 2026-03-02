@@ -53,7 +53,7 @@ public class InstitucionController {
         return ResponseEntity.ok(iSer.listar());
     }
 
-    @GetMapping("/listarInstitucionesActivas")
+    @GetMapping("/listarInstitucionesActiva")
     public ResponseEntity<List<Institucion>> listarPorEstado() {
         return ResponseEntity.ok(iSer.listarActivos());
     }
