@@ -46,7 +46,7 @@ public class SecurityConfigJwt {
             
             .requestMatchers("/criterio/**").hasRole("ADMIN")
             
-            .requestMatchers("/institucion/listarInstitucionesActiva").permitAll()
+            .requestMatchers("/institucion/listarInstitucionesActivas").permitAll()
             .requestMatchers("/institucion/listarInstituciones").hasRole("ADMIN")
             .requestMatchers("/institucion/registrarInstitucion").hasRole("ADMIN")
             .requestMatchers("/institucion/actualizarInstitucion/**").hasRole("ADMIN")
