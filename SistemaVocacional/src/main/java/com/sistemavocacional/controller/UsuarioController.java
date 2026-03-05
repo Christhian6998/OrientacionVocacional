@@ -1,5 +1,8 @@
 package com.sistemavocacional.controller;
 
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,6 +37,11 @@ public class UsuarioController {
 	@PostMapping("/registrarUsuario")
 	public ResponseEntity<?> guardarUsuario(@RequestBody Usuario u) {
 	    try {
+	        String errorValidacion = validarInputs(u);
+	        if (errorValidacion != null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorValidacion);
+            }
+
 	        u.setPassword(pasEncode.encode(u.getPassword()));
 	        
 	        if (!uSer.buscarPorEmail(u.getEmail()).isEmpty()) {
@@ -54,7 +62,7 @@ public class UsuarioController {
 	        
 	        Usuario nuevo = uSer.guardar(u);
 
-	        return ResponseEntity.ok(nuevo); // Devuelve 200 OK con el usuario registrado
+	        return ResponseEntity.ok(nuevo);
 	    } catch (Exception e) {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 	                             .body("Error al registrar usuario");
@@ -83,6 +91,11 @@ public class UsuarioController {
 	@PutMapping("/actualizarUsuario/{id}")
 	public ResponseEntity<?> actualizarUsuario(@PathVariable int id, @RequestBody Usuario u) {
 		// validacion de seguridad
+		String errorValidacion = validarInputs(u);
+        if (errorValidacion != null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorValidacion);
+        }
+        
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 	    String emailAutenticado = auth.getName();
 	    boolean isAdmin = auth.getAuthorities().stream()
@@ -118,6 +131,8 @@ public class UsuarioController {
 	    actual.setApellido(u.getApellido().toUpperCase());
 	    actual.setEmail(u.getEmail());
 	    actual.setTelefono(u.getTelefono());
+	    actual.setDireccion(u.getDireccion());
+	    actual.setFechaNacimiento(u.getFechaNacimiento());
 
 	    // Actualizar consentimiento si llega
 	    if (u.isConsentimiento() != actual.isConsentimiento()) {
@@ -146,6 +161,39 @@ public class UsuarioController {
 	    return ResponseEntity.ok("Usuario eliminado correctamente");
 	}
 
+	private String validarInputs(Usuario u) {
+        String letrasEspacios = "^[a-zA-ZñÑáéíóúÁÉÍÓÚ\\s]+$";
+        String alfanumericoEspacios = "^[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ\\s]+$";
+        String telefonoRegex = "^9\\d{8}$";
+
+        if (u.getNombre() == null || !u.getNombre().matches(letrasEspacios)) {
+            return "Nombre inválido: solo letras y espacios.";
+        }
+        if (u.getApellido() == null || !u.getApellido().matches(letrasEspacios)) {
+            return "Apellido inválido: solo letras y espacios.";
+        }
+        if (u.getTelefono() == null || !u.getTelefono().matches(telefonoRegex)) {
+            return "Teléfono inválido: debe tener 9 dígitos y empezar con 9.";
+        }
+        if (u.getDireccion() != null && !u.getDireccion().matches(alfanumericoEspacios)) {
+            return "Dirección inválida: solo letras, números y espacios.";
+        }
+        if (u.getFechaNacimiento() == null) {
+            return "La fecha de nacimiento es obligatoria.";
+        }
+        
+        LocalDate fechaNac = u.getFechaNacimiento().toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+		LocalDate hoy = LocalDate.now();
+		int edad = Period.between(fechaNac, hoy).getYears();
+		
+		if (edad < 14 || edad > 25) {
+		return "Edad no permitida: debe tener entre 14 y 25 años (Edad actual: " + edad + ").";
+		}
+        
+        return null;
+    }
 
 	
 }
