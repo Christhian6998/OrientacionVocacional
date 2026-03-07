@@ -175,8 +175,10 @@ public class UsuarioController {
         if (u.getTelefono() == null || !u.getTelefono().matches(telefonoRegex)) {
             return "Teléfono inválido: debe tener 9 dígitos y empezar con 9.";
         }
-        if (u.getDireccion() != null && !u.getDireccion().matches(alfanumericoEspacios)) {
-            return "Dirección inválida: solo letras, números y espacios.";
+        if (u.getDireccion() != null && !u.getDireccion().trim().isEmpty()) {
+            if (!u.getDireccion().matches(alfanumericoEspacios)) {
+                return "Dirección inválida: solo letras, números y espacios.";
+            }
         }
         if (u.getFechaNacimiento() == null) {
             return "La fecha de nacimiento es obligatoria.";
