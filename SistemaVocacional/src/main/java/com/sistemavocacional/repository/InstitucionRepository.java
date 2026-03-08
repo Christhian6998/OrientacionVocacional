@@ -11,6 +11,6 @@ import com.sistemavocacional.entity.Institucion;
 @Repository
 public interface InstitucionRepository extends JpaRepository<Institucion, Integer> {
 	Optional<Institucion> findByNombre(String nombre);
-	List<Institucion> findByEstadoTrue();
+	List<Institucion> findByEstadoTrueOrderByNombreAsc();
 	List<Institucion> findAllByOrderByNombreAsc();
 }

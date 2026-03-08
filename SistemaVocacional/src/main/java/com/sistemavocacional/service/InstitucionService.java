@@ -41,7 +41,7 @@ public class InstitucionService {
     }
 
     public List<Institucion> listarActivos() {
-        return instRepo.findByEstadoTrue();
+        return instRepo.findByEstadoTrueOrderByNombreAsc();
     }
 
     public Institucion actualizar(Institucion i) {
