@@ -127,12 +127,12 @@ public class UsuarioController {
 	    }
 
 	    // Actualizar datos
-	    actual.setNombre(u.getNombre().toUpperCase());
-	    actual.setApellido(u.getApellido().toUpperCase());
-	    actual.setEmail(u.getEmail());
-	    actual.setTelefono(u.getTelefono());
-	    actual.setDireccion(u.getDireccion());
-	    actual.setFechaNacimiento(u.getFechaNacimiento());
+	    if (u.getNombre() != null && !u.getNombre().isEmpty()) actual.setNombre(u.getNombre().toUpperCase());
+	    if (u.getApellido() != null && !u.getApellido().isEmpty()) actual.setApellido(u.getApellido().toUpperCase());
+	    if (u.getEmail() != null && !u.getEmail().isEmpty()) actual.setEmail(u.getEmail());
+	    if (u.getTelefono() != null && !u.getTelefono().isEmpty()) actual.setTelefono(u.getTelefono());
+	    if (u.getDireccion() != null) actual.setDireccion(u.getDireccion());
+	    if (u.getFechaNacimiento() != null) actual.setFechaNacimiento(u.getFechaNacimiento());
 
 	    // Actualizar consentimiento si llega
 	    if (u.isConsentimiento() != actual.isConsentimiento()) {
