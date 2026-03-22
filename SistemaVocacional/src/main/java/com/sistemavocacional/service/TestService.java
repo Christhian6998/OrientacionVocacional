@@ -63,8 +63,7 @@ public class TestService {
 
     @Transactional
     public List<RecomendacionCarrera> registrarResultadoManual(TestRequestDTO dto, Integer idC1, Integer idC2, Integer idC3) {
-        final double MAX_PUNTAJE_POR_PREGUNTA = 3.0;
-
+        
         // 1. Setup inicial
         Usuario user = userRepo.findById(dto.getIdUsuario()).orElseThrow(() -> new RuntimeException("User not found"));
         IntentoTest intento = new IntentoTest();
@@ -74,7 +73,6 @@ public class TestService {
         IntentoTest guardado = intentoRepo.save(intento);
 
         Map<Integer, Double> puntajePorCriterio = new HashMap<>();
-        Map<Integer, Double> maxPosiblePorCriterio = new HashMap<>();
 
         // 2. Procesar respuestas y parsear áreas
         List<Respuesta> listaRespuestas = dto.getRespuestas().stream().map(rDto -> {
@@ -85,22 +83,16 @@ public class TestService {
             r.setValor(rDto.getValor());
             r.setPuntaje(rDto.getPuntaje());
 
-            List<Integer> idsCriterios = new ArrayList<>();
-            if (p.getCriterio() != null) {
-                idsCriterios.add(p.getCriterio().getIdCriterio());
-            } else if (p.getArea() != null) {
-                String[] nombres = p.getArea().split("_");
-                for (String nombre : nombres) {
-                    criterioRep.findByNombre(nombre).ifPresent(c -> idsCriterios.add(c.getIdCriterio()));
-                }
-            }
-
             double puntajeUsuarioEnPregunta = rDto.getPuntaje() * p.getPeso();
-            double maxPosibleEnPregunta = MAX_PUNTAJE_POR_PREGUNTA * p.getPeso();
 
-            for (Integer idCriterio : idsCriterios) {
-                puntajePorCriterio.put(idCriterio, puntajePorCriterio.getOrDefault(idCriterio, 0.0) + puntajeUsuarioEnPregunta);
-                maxPosiblePorCriterio.put(idCriterio, maxPosiblePorCriterio.getOrDefault(idCriterio, 0.0) + maxPosibleEnPregunta);
+            if (p.getCriterio() != null) {
+                puntajePorCriterio.merge(p.getCriterio().getIdCriterio(), puntajeUsuarioEnPregunta, Double::sum);
+            } else if (p.getArea() != null) {
+                for (String nombre : p.getArea().split("_")) {
+                    criterioRep.findByNombre(nombre).ifPresent(c -> 
+                        puntajePorCriterio.merge(c.getIdCriterio(), puntajeUsuarioEnPregunta, Double::sum)
+                    );
+                }
             }
             return r;
         }).toList();
@@ -108,12 +100,14 @@ public class TestService {
         respuestaRepo.saveAll(listaRespuestas);
 
         // 3. Recomendación base
-        List<Integer> criteriosTop = puntajePorCriterio.entrySet().stream()
+        List<Integer> userTop5 = puntajePorCriterio.entrySet().stream()
                 .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))
-                .map(Map.Entry::getKey).toList();
+                .map(Map.Entry::getKey)
+                .limit(5) // Limitar estrictamente a 5
+                .toList();
 
         Recomendacion rec = new Recomendacion();
-        rec.setPerfil(criteriosTop.stream().limit(2).map(id -> {
+        rec.setPerfil(userTop5.stream().limit(2).map(id -> {
 			        	Criterio c = criterioRep.findById(id).orElse(null);
 			            return (c != null) ? c.getNombre() : "Unknown";
 			        }).collect(Collectors.joining(" - ")));
@@ -127,60 +121,57 @@ public class TestService {
                 .collect(Collectors.groupingBy(cc -> cc.getCarrera().getIdCarrera()));
 
         relacionesPorCarrera.forEach((idCarrera, requisitos) -> {
-            double puntosObtenidos = 0.0;
-            double puntosMaximosEvaluados = 0.0;
-            int criteriosCoincidentes = 0;
+        	List<Integer> careerTop5 = requisitos.stream()
+                    .sorted((a, b) -> Integer.compare(b.getPeso(), a.getPeso()))
+                    .map(cc -> cc.getCriterio().getIdCriterio())
+                    .toList();
+        	
+        	double afinidad = 0.0;
+            double[] pesosAf = {40.0, 30.0, 15.0, 10.0, 5.0};
 
-            for (CriterioCarrera cc : requisitos) {
-                Integer idCrit = cc.getCriterio().getIdCriterio();
+            for (int i = 0; i < careerTop5.size() && i < 5; i++) {
+                Integer idCritCarrera = careerTop5.get(i);
                 
-                if (maxPosiblePorCriterio.containsKey(idCrit)) {
-                    double peso = cc.getPeso();
-                    double puntajeUsuario = puntajePorCriterio.get(idCrit);
-                    double maxCriterio = maxPosiblePorCriterio.get(idCrit);
-
-                    double ratio = puntajeUsuario / maxCriterio;
-                    
-                    double bono = (peso >= 7) ? 1.2 : 1.0;
-
-                    puntosObtenidos += (ratio * peso * bono);
-                    puntosMaximosEvaluados += (peso * bono);
-                    criteriosCoincidentes++;
+                if (i < userTop5.size() && idCritCarrera.equals(userTop5.get(i))) {
+                    afinidad += pesosAf[i];
+                } else if (userTop5.contains(idCritCarrera)) {
+                    afinidad += pesosAf[i] * 0.5; 
                 }
             }
 
-            double factorPenalizacion = (criteriosCoincidentes < 2) ? 0.7 : 1.0;
-
-            double porcentaje = (puntosMaximosEvaluados > 0) 
-                ? (puntosObtenidos / puntosMaximosEvaluados) * 100 * factorPenalizacion
-                : 5.0;
-
-            afinidadCarrera.put(idCarrera, Math.min(porcentaje, 99.0)); 
+            afinidad += (idCarrera * 0.00001);
+            afinidadCarrera.put(idCarrera, Math.min(afinidad, 99.99));
         });
 
         // 5. Build del listado final
         List<RecomendacionCarrera> listaFinal = new ArrayList<>();
         
         // Agregar Top 3 generadas
-        List<Integer> carrerasTop = afinidadCarrera.entrySet().stream()
-                .sorted((a, b) -> b.getValue().compareTo(a.getValue()))
-                .limit(3).map(Map.Entry::getKey).toList();
-
-        for (Integer idCarrera : carrerasTop) {
-            Carrera c = carreraRepo.findById(idCarrera).orElseThrow();
-            listaFinal.add(crearRecCarrera(recGuardada, c, afinidadCarrera.get(idCarrera)));
+        List<Integer> idManuales = java.util.stream.Stream.of(idC1, idC2, idC3)
+                .filter(id -> id != null && id > 0)
+                .distinct()
+                .toList();
+        // Camino A: Insertar manuales con su afinidad real calculada
+        for (Integer idM : idManuales) {
+            carreraRepo.findById(idM).ifPresent(c -> {
+                listaFinal.add(crearRecCarrera(recGuardada, c, afinidadCarrera.getOrDefault(idM, 0.0)));
+            });
         }
+        
+        // Camino B: Completar con el ranking automático hasta llegar a 3
+        List<Integer> mejoresCalculadas = afinidadCarrera.entrySet().stream()
+                .sorted((a, b) -> b.getValue().compareTo(a.getValue()))
+                .map(Map.Entry::getKey)
+                .toList();
 
-        // 6. Force de carreras manuales
-        Arrays.asList(idC1, idC2, idC3).forEach(id -> {
-            if (id != null && id > 0) {
-                carreraRepo.findById(id).ifPresent(c -> {
-                    if (listaFinal.stream().noneMatch(lf -> lf.getCarrera().getIdCarrera().equals(c.getIdCarrera()))) {
-                        listaFinal.add(crearRecCarrera(recGuardada, c, afinidadCarrera.getOrDefault(c.getIdCarrera(), 5.0)));
-                    }
-                });
+        for (Integer idAuto : mejoresCalculadas) {
+            if (listaFinal.size() >= 3) break;
+            
+            if (listaFinal.stream().noneMatch(rc -> rc.getCarrera().getIdCarrera().equals(idAuto))) {
+                Carrera c = carreraRepo.findById(idAuto).orElseThrow();
+                listaFinal.add(crearRecCarrera(recGuardada, c, afinidadCarrera.get(idAuto)));
             }
-        });
+        }
 
         return recCarreraRepo.saveAll(listaFinal);
     }
